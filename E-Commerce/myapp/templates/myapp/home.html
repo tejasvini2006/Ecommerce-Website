@@ -1,0 +1,91 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Home - Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_authenticated %}
+        <div class="card">
+            <div class="text-center">
+                <h1>Welcome to Our Shop</h1>
+                <p>Thank you for joining us! You are now logged in.</p>
+                {% if user.customer.profile_pic %}
+                    <img src="{{ user.customer.profile_pic.url }}" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;">
+                {% endif %}
+                <div class="mt-4">
+                    <h3>Your Profile Information</h3>
+                    <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Mobile:</strong> {{ user.customer.mobile }}</p>
+                    <p><strong>Address:</strong> {{ user.customer.address }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mt-4">
+        <h2 class="text-center">Categories</h2>
+        <div class="category-grid">
+            {% for category in categories %}
+                <div class="category-item">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <h3>{{ category.name }}</h3>
+                    <p>{{ category.description|truncatewords:20 }}</p>
+                    <a href="{% url 'product_list' %}?category={{ category.id }}" class="btn btn-primary">View Products</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <h2 class="text-center">Featured Products</h2>
+        <div class="product-grid">
+            {% for product in featured_products %}
+                <div class="product-item">
+                    <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                    <h3>{{ product.name }}</h3>
+                    <p class="price">
+                        {% if product.sale_price %}
+                            <span class="sale-price">${{ product.sale_price }}</span>
+                            <span class="original-price">${{ product.price }}</span>
+                        {% else %}
+                            <span>${{ product.price }}</span>
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .category-grid, .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    .category-item, .product-item {
+        text-align: center;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    .price {
+        margin: 10px 0;
+    }
+    .sale-price {
+        color: #e44d26;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+    }
+</style>
+{% endblock %} 

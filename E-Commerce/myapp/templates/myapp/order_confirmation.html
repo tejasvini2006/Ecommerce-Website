@@ -1,0 +1,217 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmation - Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirmation-container">
+        <div class="confirmation-header">
+            <div class="success-icon">✓</div>
+            <h1>Order Confirmed!</h1>
+            <p>Thank you for your purchase. Your order has been successfully placed.</p>
+        </div>
+        
+        <div class="order-details">
+            <div class="order-info">
+                <h2>Order Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Order Number:</span>
+                        <span class="value">#{{ order.id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Order Date:</span>
+                        <span class="value">{{ order.order_date|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Payment Status:</span>
+                        <span class="value status-success">Paid</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Shipping Status:</span>
+                        <span class="value status-pending">Processing</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="shipping-info">
+                <h2>Shipping Information</h2>
+                <div class="address-card">
+                    <p class="name">{{ order.shipping_name }}</p>
+                    <p class="address">{{ order.shipping_address }}</p>
+                    <p class="city">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip_code }}</p>
+                    <p class="country">{{ order.shipping_country }}</p>
+                    <p class="phone">Phone: {{ order.shipping_phone }}</p>
+                </div>
+            </div>
+            
+            <div class="order-items">
+                <h2>Order Items</h2>
+                {% for item in order.orderitem_set.all %}
+                    <div class="order-item">
+                        <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div class="item-info">
+                            <h3>{{ item.product.name }}</h3>
+                            <p>Quantity: {{ item.quantity }}</p>
+                            <p class="item-price">
+                                {% if item.product.sale_price %}
+                                    <span class="sale-price">₹{{ item.product.sale_price }}</span>
+                                    <span class="original-price">₹{{ item.product.price }}</span>
+                                {% else %}
+                                    <span>₹{{ item.product.price }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="item-total">
+                            ₹{{ item.get_total_price }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <span>Subtotal:</span>
+                        <span>₹{{ order.subtotal }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Shipping:</span>
+                        <span>₹{{ order.shipping_cost }}</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total:</span>
+                        <span>₹{{ order.total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="confirmation-actions">
+            <a href="{% url 'order_history' %}" class="btn btn-secondary">View Order History</a>
+            <a href="{% url 'product_list' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .confirmation-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .confirmation-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #28a745;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        margin: 0 auto 20px;
+    }
+    .order-details {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .order-info, .shipping-info, .order-items, .order-summary {
+        margin-bottom: 30px;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 15px;
+    }
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    .label {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 5px;
+    }
+    .value {
+        font-weight: bold;
+    }
+    .status-success {
+        color: #28a745;
+    }
+    .status-pending {
+        color: #ffc107;
+    }
+    .address-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+    .address-card p {
+        margin: 5px 0;
+    }
+    .address-card .name {
+        font-weight: bold;
+    }
+    .order-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 20px;
+        padding: 20px 0;
+        border-bottom: 1px solid #ddd;
+    }
+    .order-item img {
+        border-radius: 4px;
+    }
+    .item-info h3 {
+        margin: 0 0 10px 0;
+    }
+    .item-price {
+        margin: 5px 0;
+    }
+    .sale-price {
+        color: #e44d26;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+    }
+    .item-total {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    .summary-details {
+        margin-top: 15px;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .summary-item.total {
+        font-size: 1.2em;
+        font-weight: bold;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+    .confirmation-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+</style>
+{% endblock %} 
